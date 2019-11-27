@@ -47,12 +47,20 @@ async def remRole(ctx, *, roleName):
                 "Voilà %s, tu n'as maintenant plus le rôle %s." % (ctx.author.display_name, role.name))
             print(len(role.members))
 
-@role.command(name="list")  # TODO Pouvoir demander qui a le rôle X
-async def listRoles(ctx):
-    rolesList = ""
-    for role in ctx.guild.roles:
-        rolesList = rolesList + ("%s (%d membres)\n" % (role.name, len(role.members)))
-    await ctx.send("Voici la liste des rôles qui existent ici :\n```\n%s\n```" % str(rolesList))
+@role.command(name="list")
+async def listRoles(ctx, *, role=None):
+    guild = ctx.guild
+    if role is None:
+        rolesList = ""
+        for role in ctx.guild.roles:
+            rolesList = rolesList + ("%s (%d membres)\n" % (role.name, len(role.members)))
+        await ctx.send("Voici la liste des rôles qui existent ici :\n```\n%s\n```" % str(rolesList))
+    else:
+        membersList = ""
+        inRole = discord.utils.get(guild.roles, name=role)
+        for member in inRole.members:
+            membersList = membersList + member.display_name + "\n"
+        await ctx.send("Voici la liste des gens dans %s :\n```\n%s\n```" % (inRole, membersList))
 
 
 @bot.command(name="lionel")
