@@ -47,7 +47,7 @@ async def remRole(ctx, *, roleName):
                 "Voilà %s, tu n'as maintenant plus le rôle %s." % (ctx.author.display_name, role.name))
             print(len(role.members))
 
-@role.command(name="list")
+@role.command(name="list")  # TODO Pouvoir demander qui a le rôle X
 async def listRoles(ctx):
     rolesList = ""
     for role in ctx.guild.roles:
