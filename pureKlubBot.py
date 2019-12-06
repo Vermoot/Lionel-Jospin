@@ -18,6 +18,14 @@ def isSimilar(str1, str2):
 async def on_ready():
     print("Bot lancé.")
 
+@bot.command(name="add")
+async def add(ctx, machin):
+    await ctx.send("Non c'est `!role add`.")
+
+@bot.command(name="roll")
+async def add(ctx, machin):
+    await ctx.send("ROLE bordel, pas roll. Fais un effort marde.")
+
 
 @bot.group(name="role")
 async def role(ctx):
