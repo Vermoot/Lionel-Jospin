@@ -166,6 +166,10 @@ async def listRoles(ctx, *, role=None):
             membersList = membersList + member.display_name + "\n"
         await ctx.send("Voici la liste des gens dans %s :\n```\n%s\n```" % (inRole, membersList))
 
+@role.command(name="ass")
+async def ass(ctx):
+    await ctx.send("Non mais là c'est indécent. Autocorrect ou pas autocorrect.")
+
 
 @bot.group(name="lionel")
 async def lionel(ctx):
