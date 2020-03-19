@@ -1,13 +1,13 @@
 import os
 import discord
-import random
 from discord.ext import commands
+import random
 from dotenv import load_dotenv
 from difflib import SequenceMatcher
 
 load_dotenv()
-token = os.getenv("DISCORD_TOKEN")
-guild = os.getenv("DISCORD_GUILD")
+TOKEN = os.getenv("DISCORD_TOKEN")
+GUILD = os.getenv("DISCORD_GUILD")
 bot = commands.Bot(command_prefix='!')
 
 
@@ -191,4 +191,4 @@ async def repeat(ctx, *, message):
     await ctx.send(message)
 
 
-bot.run(token)
+bot.run(TOKEN)
