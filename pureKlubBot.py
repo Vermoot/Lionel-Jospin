@@ -79,7 +79,7 @@ async def addRole(ctx, *, roleName):
                         if answer.content.lower().startswith("oui"):
                             newRole = await ctx.guild.create_role(name=roleName, mentionable=True)
                             await ctx.author.add_roles(newRole)
-                            await ctx.send("Ok, tu l'auras voulu. Tu as maintenant le rôle %s. Vous êtes %i." % (newRole.name, len(newRole.members)))
+                            await ctx.send("Ok, tu l'auras voulu. Tu as maintenant le rôle %s. Vous êtes %i. Je crois. Mais je suis pas fort en math." % (newRole.name, len(newRole.members)))
                             return
 
             # Non je ne veux pas le rôle demandé au départ
