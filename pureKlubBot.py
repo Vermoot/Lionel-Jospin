@@ -46,7 +46,7 @@ async def addRole(ctx, *, roleName):
                 return
             else:
                 await ctx.author.add_roles(role)
-                await ctx.send("Voilà %s, tu as maintenant le rôle %s ! Vous êtes %i." % (
+                await ctx.send("Voilà %s, tu as maintenant le rôle %s ! Vous êtes %i. Je crois. Mais je suis pas fort en math." % (
                 ctx.author.display_name, role.name, len(role.members)))
                 return
 
@@ -65,7 +65,7 @@ async def addRole(ctx, *, roleName):
                         return
                     else:
                         await ctx.author.add_roles(role)
-                        await ctx.send("Alors ok, tu as maintenant le rôle %s ! Vous êtes %i." % (
+                        await ctx.send("Alors ok, tu as maintenant le rôle %s ! Vous êtes %i. Je crois. Mais je suis pas fort en math." % (
                                         role.name, len(role.members)))
                         return
 
