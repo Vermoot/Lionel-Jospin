@@ -3,7 +3,6 @@ from discord.ext import commands
 from difflib import SequenceMatcher
 
 
-
 def isSimilar(str1, str2):
     return SequenceMatcher(None, str1, str2).ratio() > 0.5
 
@@ -13,14 +12,12 @@ class RolesCog(commands.Cog):
         self.bot = bot
 
     async def getRole(self, ctx, userInput, scope):
-
         for role in scope:
-
             # Si le rôle existe (indépendant de la casse)
             if userInput.lower() == role.name.lower():
                 return role
 
-        for role in scope:
+        for role in scope: # En deux boucles pour que les rôles existants soient bien prioritaires
 
             # Si un rôle ressemblant existe
             if isSimilar(userInput, role.name):
@@ -46,7 +43,7 @@ class RolesCog(commands.Cog):
                         await ctx.send("Oui ou non, bordel.")
 
         # Si le rôle n'existe pas
-        return userInput
+        return userInput # ATTENTION c'est une string
 
 
 
@@ -55,6 +52,7 @@ class RolesCog(commands.Cog):
         if ctx.invoked_subcommand is None:
             await ctx.send("Non là t'as merdé mon coco.")
 
+    # S'attribuer un rôle avec !role add rôle
     @role.command(name="add")
     async def addRole(self, ctx, *, roleName):
         newRole = await self.getRole(ctx, roleName, ctx.guild.roles)
@@ -75,6 +73,7 @@ class RolesCog(commands.Cog):
                     ctx.author.display_name, newRole.name, len(newRole.members)))
             return
 
+    # S'enlever un rôle avec !role remove rôle
     @role.command(name="remove")
     async def remRole(self, ctx, *, roleName):
         roleToRemove = await self.getRole(ctx, roleName, ctx.author.roles)
@@ -95,7 +94,7 @@ class RolesCog(commands.Cog):
         else:
             await ctx.send("Tu n'as pas le rôle %s, andouille." % roleToRemove)
 
-
+    # Voir la liste des rôles avec !role list /// Voir les membres d'un rôle avec !role list rôle
     @role.command(name="list")
     async def listRoles(self, ctx, *, role=None):
         if role is None:
@@ -115,14 +114,17 @@ class RolesCog(commands.Cog):
                     membersList = membersList + member.display_name + "\n"
                 await ctx.send("Voici la liste des gens dans %s :\n```\n%s\n```" % (inRole.name, membersList))
 
+    # Drôle
     @role.command(name="ass")
     async def ass(self, ctx):
         await ctx.send("Non mais là c'est indécent. Autocorrect ou pas autocorrect.")
 
+    # Rappel
     @commands.command(name="add")
     async def add(self, ctx):
         await ctx.send("Non c'est `!role add`.")
 
+    # Pour Sam
     @commands.command(name="roll")
     async def add(self, ctx):
         await ctx.send("ROLE bordel, pas roll. Fais un effort marde.")
