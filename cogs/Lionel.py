@@ -2,7 +2,6 @@ import discord
 from discord.ext import commands
 import random
 
-bot = commands.Bot(command_prefix='!')
 
 class LionelCog(commands.Cog):
     def __init__(self, bot):
@@ -22,6 +21,7 @@ class LionelCog(commands.Cog):
     @lionel.command(name="help")
     async def help(self, ctx):
         discord.ext.commands.HelpCommand(ctx)
+
 
 def setup(bot):
     bot.add_cog(LionelCog(bot))

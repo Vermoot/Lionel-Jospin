@@ -1,9 +1,6 @@
 import os
-import discord
 from discord.ext import commands
-import random
 from dotenv import load_dotenv
-from difflib import SequenceMatcher
 
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
@@ -20,7 +17,6 @@ for cog in init_cogs:
 @bot.event
 async def on_ready():
     print("Bot lancé.")
-
 
 
 @bot.command(name="repeat")

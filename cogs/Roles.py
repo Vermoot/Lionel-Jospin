@@ -1,9 +1,8 @@
-import discord
 from discord.ext import commands
 from difflib import SequenceMatcher
 
 
-def isSimilar(str1, str2):
+def is_similar(str1, str2):
     return SequenceMatcher(None, str1, str2).ratio() > 0.5
 
 
@@ -11,16 +10,16 @@ class RolesCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    async def getRole(self, ctx, userInput, scope):
+    async def get_role(self, ctx, user_input, scope):
         for role in scope:
             # Si le rôle existe (indépendant de la casse)
-            if userInput.lower() == role.name.lower():
+            if user_input.lower() == role.name.lower():
                 return role
 
-        for role in scope: # En deux boucles pour que les rôles existants soient bien prioritaires
+        for role in scope:  # En deux boucles pour que les rôles existants soient bien prioritaires
 
             # Si un rôle ressemblant existe
-            if isSimilar(userInput, role.name):
+            if is_similar(user_input, role.name):
                 def check(m):
                     return m.author == ctx.author
                 await ctx.send("Est-ce que tu veux dire \"%s\" ?" % role.name)
@@ -29,11 +28,11 @@ class RolesCog(commands.Cog):
                     if answer.content.lower().startswith("oui"):
                         return role
                     elif answer.content.lower().startswith("non"):
-                        await ctx.send("Donc tu veux bien dire %s ?" % userInput)
+                        await ctx.send("Donc tu veux bien dire %s ?" % user_input)
                         while True:
                             answer = await self.bot.wait_for("message", check=check, timeout=10)
                             if answer.content.lower().startswith("oui"):
-                                return userInput
+                                return user_input
                             elif answer.content.lower().startswith("non"):
                                 await ctx.send("Ouais ben reviens me voir quand tu seras décidé alors hein. Merde.")
                                 return None
@@ -43,9 +42,7 @@ class RolesCog(commands.Cog):
                         await ctx.send("Oui ou non, bordel.")
 
         # Si le rôle n'existe pas
-        return userInput # ATTENTION c'est une string
-
-
+        return user_input  # ATTENTION c'est une string
 
     @commands.group(name="role")
     async def role(self, ctx):
@@ -54,65 +51,65 @@ class RolesCog(commands.Cog):
 
     # S'attribuer un rôle avec !role add rôle
     @role.command(name="add")
-    async def addRole(self, ctx, *, roleName):
-        newRole = await self.getRole(ctx, roleName, ctx.guild.roles)
-        if newRole is None:
+    async def add_role(self, ctx, *, role_name):
+        new_role = await self.get_role(ctx, role_name, ctx.guild.roles)
+        if new_role is None:
             return
-        elif isinstance(newRole, str):
-            role = await ctx.guild.create_role(name=newRole, mentionable=True)
+        elif isinstance(new_role, str):
+            role = await ctx.guild.create_role(name=new_role, mentionable=True)
             await ctx.author.add_roles(role)
             await ctx.send("Voilà %s, tu as maintenant le rôle %s ! Tu es le premier, invite tes copains!" % (
                 ctx.author.display_name, role.name))
-        elif ctx.author in newRole.members:
-            await ctx.send("Tu as déjà le rôle %s, couillon." % newRole.name)
+        elif ctx.author in new_role.members:
+            await ctx.send("Tu as déjà le rôle %s, couillon." % new_role.name)
             return
         else:
-            await ctx.author.add_roles(newRole)
+            await ctx.author.add_roles(new_role)
             await ctx.send(
                 "Voilà %s, tu as maintenant le rôle %s ! Vous êtes %i. Je crois. Mais je suis pas fort en math." % (
-                    ctx.author.display_name, newRole.name, len(newRole.members)))
+                    ctx.author.display_name, new_role.name, len(new_role.members)))
             return
 
     # S'enlever un rôle avec !role remove rôle
     @role.command(name="remove")
-    async def remRole(self, ctx, *, roleName):
-        roleToRemove = await self.getRole(ctx, roleName, ctx.author.roles)
-        if roleToRemove is None:
+    async def remove_role(self, ctx, *, role_name):
+        role_to_remove = await self.get_role(ctx, role_name, ctx.author.roles)
+        if role_to_remove is None:
             return
-        elif roleToRemove in ctx.author.roles:
-            await ctx.author.remove_roles(roleToRemove)
-            if len(roleToRemove.members) == 0:
-                await roleToRemove.delete()
+        elif role_to_remove in ctx.author.roles:
+            await ctx.author.remove_roles(role_to_remove)
+            if len(role_to_remove.members) == 0:
+                await role_to_remove.delete()
                 await ctx.send(
                     "Voilà %s, tu n'as maintenant plus le rôle %s. Plus personne ne l'a, d'ailleurs. Je le ferme." % (
-                        ctx.author.display_name, roleToRemove.name))
+                        ctx.author.display_name, role_to_remove.name))
                 return
             else:
                 await ctx.send(
-                    "Voilà %s, tu n'as maintenant plus le rôle %s." % (ctx.author.display_name, roleToRemove.name))
+                    "Voilà %s, tu n'as maintenant plus le rôle %s." % (ctx.author.display_name, role_to_remove.name))
                 return
         else:
-            await ctx.send("Tu n'as pas le rôle %s, andouille." % roleToRemove)
+            await ctx.send("Tu n'as pas le rôle %s, andouille." % role_to_remove)
 
     # Voir la liste des rôles avec !role list /// Voir les membres d'un rôle avec !role list rôle
     @role.command(name="list")
-    async def listRoles(self, ctx, *, role=None):
+    async def list_roles(self, ctx, *, role=None):
         if role is None:
-            rolesList = ""
+            roles_list = ""
             for role in ctx.guild.roles:
-                rolesList = rolesList + ("%s (%i membres)\n" % (role.name, len(role.members)))
-            await ctx.send("Voici la liste des rôles qui existent ici :\n```\n%s\n```" % str(rolesList))
+                roles_list = roles_list + ("%s (%i membres)\n" % (role.name, len(role.members)))
+            await ctx.send("Voici la liste des rôles qui existent ici :\n```\n%s\n```" % str(roles_list))
         else:
-            inRole = await self.getRole(ctx, role, ctx.guild.roles)
-            if isinstance(inRole, str):
-                await ctx.send("Le rôle %s n'existe pas." % inRole)
-            elif inRole is None:
+            in_role = await self.get_role(ctx, role, ctx.guild.roles)
+            if isinstance(in_role, str):
+                await ctx.send("Le rôle %s n'existe pas." % in_role)
+            elif in_role is None:
                 return
             else:
-                membersList = ""
-                for member in inRole.members:
-                    membersList = membersList + member.display_name + "\n"
-                await ctx.send("Voici la liste des gens dans %s :\n```\n%s\n```" % (inRole.name, membersList))
+                members_list = ""
+                for member in in_role.members:
+                    members_list = members_list + member.display_name + "\n"
+                await ctx.send("Voici la liste des gens dans %s :\n```\n%s\n```" % (in_role.name, members_list))
 
     # Drôle
     @role.command(name="ass")
