@@ -11,3 +11,8 @@ async def reaction_menu(bot, ctx, question, choices):
     def check(reaction, user): return user == ctx.author
     reaction = await bot.wait_for("reaction_add", check=check)
     return list(reaction)[0].emoji
+
+
+async def yes_or_no(bot, ctx, question):
+    answer = await reaction_menu(bot, ctx, question, ["👍", "👎"])
+    return answer == "👍"

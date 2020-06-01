@@ -38,7 +38,12 @@ class LionelCog(commands.Cog):
         else:
             await ctx.send("Comment ça %s ???" % choice[0])
 
-
+    @commands.command(name="yesorno")
+    async def yesorno(self, ctx):
+        if await yes_or_no(self.bot, ctx, "Ça va ou quoi ?"):
+            await ctx.send("Coolos !")
+        else:
+            await ctx.send("Bah merde alors !")
 
 def setup(bot):
     bot.add_cog(LionelCog(bot))
