@@ -1,30 +1,10 @@
-import discord
 from discord.ext import commands
 import random
-# from Utilities import reaction_menu
-
-
+from cogs.LionelUtils import *
 
 class LionelCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-
-    async def reaction_menu(self, ctx, question, *choices: str):
-        choice_number = 1
-        message_text = question + "```"
-        for choice in list(choices):
-            message_text += "%s️⃣ %s \n" % (choice_number, choice)
-            choice_number += 1
-        message_text += "```"
-        message = await ctx.send(message_text)
-        reaction_number = 1
-        for choice in list(choices):
-            await message.add_reaction("%s️⃣" % reaction_number)
-            reaction_number += 1
-        def check(reaction, user):
-            return user == ctx.author
-        reaction = await self.bot.wait_for("reaction_add", check=check, timeout=None)
-        return [list(reaction)[0].emoji[0], choices[int(list(reaction)[0].emoji[0])-1]]
 
     @commands.group(name="lionel")
     async def lionel(self, ctx):
@@ -37,17 +17,28 @@ class LionelCog(commands.Cog):
                                           "Qu'est-ce que ?",
                                           "Présent !"]))
 
-    @lionel.command(name="help")
-    async def help(self, ctx):
-        discord.ext.commands.HelpCommand(ctx)
-
     @commands.command(name="testmenu")
     async def test_menu(self, ctx):
-        choice = await self.reaction_menu(ctx, "Choisis une option :",  "La première",
-                                                                        "Peut-être la deuxième",
-                                                                        "Qui sait, pourquoi pas la troisième",
-                                                                        "La réponse D")
-        await ctx.send("Tu as choisi l'option %s : %s" % (choice[0], choice[1]))
+        options = {"1️⃣": "La première",
+                   "2️⃣": "Peut-être la deuxième",
+                   "3️⃣": "Qui sait, pourquoi pas la troisième",
+                   "4️⃣": "La réponse D"}
+        choice = await reaction_menu(self.bot, ctx, "Choisis une option :",  options)
+        await ctx.send("Tu as choisi l'option %s : %s" % (choice, options[choice]))
+
+    @commands.command(name="testmenu2")
+    async def test_menu2(self, ctx):
+        options = ["👍", "👎"]
+        choice = await reaction_menu(self.bot, ctx, "Ceci est le deuxième menu de test, avec PAS des nombres. Tu le trouves bien ?",
+                                          options)
+        if choice[0] == "👍":
+            await ctx.send("Merci, ça fait plaisir.")
+        elif choice[0] == "👎":
+            await ctx.send("Oh pourquoi ? 🙁")
+        else:
+            await ctx.send("Comment ça %s ???" % choice[0])
+
+
 
 def setup(bot):
     bot.add_cog(LionelCog(bot))
