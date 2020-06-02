@@ -1,3 +1,6 @@
+import asyncio
+import discord
+
 async def reaction_menu(bot, ctx, question, choices):
     message_text = question
     if isinstance(choices, dict):
@@ -16,3 +19,27 @@ async def reaction_menu(bot, ctx, question, choices):
 async def yes_or_no(bot, ctx, question):
     answer = await reaction_menu(bot, ctx, question, ["👍", "👎"])
     return answer == "👍"
+
+
+async def cancellable_question(bot, ctx, question):
+    '''
+        To be used with :
+            try:
+                action
+            except AttributeError:
+                return
+                                    '''
+    def check(m): return m.author == ctx.author
+    pending_tasks = [reaction_menu(bot, ctx, question, "❌"),
+                     bot.wait_for("message", check=check)]
+    done_tasks, pending_tasks = await asyncio.wait(pending_tasks, return_when=asyncio.FIRST_COMPLETED)
+    for task in pending_tasks:
+        task.cancel()
+    result = done_tasks.pop().result()
+    if isinstance(result, str):
+        await ctx.send("Ok j'annule, bye.")
+        return None
+    return result.content
+
+async def me_too(bot, ctx):
+    pass

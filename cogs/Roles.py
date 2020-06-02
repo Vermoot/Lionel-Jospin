@@ -1,5 +1,7 @@
 from discord.ext import commands
 from difflib import SequenceMatcher
+from LionelUtils import *
+import asyncio
 
 
 def is_similar(str1, str2):
@@ -20,26 +22,14 @@ class RolesCog(commands.Cog):
 
             # Si un rôle ressemblant existe
             if is_similar(user_input, role.name):
-                def check(m):
-                    return m.author == ctx.author
-                await ctx.send("Est-ce que tu veux dire \"%s\" ?" % role.name)
-                while True:
-                    answer = await self.bot.wait_for("message", check=check, timeout=10)
-                    if answer.content.lower().startswith("oui"):
-                        return role
-                    elif answer.content.lower().startswith("non"):
-                        await ctx.send("Donc tu veux bien dire %s ?" % user_input)
-                        while True:
-                            answer = await self.bot.wait_for("message", check=check, timeout=10)
-                            if answer.content.lower().startswith("oui"):
-                                return user_input
-                            elif answer.content.lower().startswith("non"):
-                                await ctx.send("Ouais ben reviens me voir quand tu seras décidé alors hein. Merde.")
-                                return None
-                            else:
-                                await ctx.send("Oui ou non, bordel.")
+                if await yes_or_no(self.bot, ctx, "Est-ce que tu veux dire \"%s\" ?" % role.name):
+                    return role
+                else:
+                    if await yes_or_no(self.bot, ctx, "Donc tu veux bien dire %s ?" % user_input):
+                        return user_input
                     else:
-                        await ctx.send("Oui ou non, bordel.")
+                        await ctx.send("Ouais ben reviens me voir quand tu seras décidé alors hein. Merde.")
+                        return None
 
         # Si le rôle n'existe pas
         return user_input  # ATTENTION c'est une string
@@ -47,7 +37,37 @@ class RolesCog(commands.Cog):
     @commands.group(name="role")
     async def role(self, ctx):
         if ctx.invoked_subcommand is None:
-            await ctx.send("Non là t'as merdé mon coco.")
+            options = {"➕": "M'ajouter un rôle",
+                       "➖": "Me retirer un rôle",
+                       "📄": "Voir la liste des rôles existants",
+                       "👨‍👨‍👦‍👦": "Voir les membres d'un rôle"}
+            choice1 = await reaction_menu(self.bot, ctx, "Tu veux faire quoi mon coco ?", options)
+
+            def check(m):
+                return m.author == ctx.author
+            if choice1 == "➕":
+                rolename = await cancellable_question(self.bot, ctx, "Tu veux quoi comme rôle ?")
+                try:
+                    await self.add_role(ctx, role_name=rolename)
+                except AttributeError:
+                    return
+            elif choice1 == "➖":
+                rolename = await cancellable_question(self.bot, ctx, "Lequel ?")
+                try:
+                    await self.remove_role(ctx, role_name=rolename)
+                except AttributeError:
+                    return
+            elif choice1 == "📄":
+                try:
+                    await self.list_roles(ctx)
+                except AttributeError:
+                    return
+            elif choice1 == "👨‍👨‍👦‍👦":
+                rolename = await cancellable_question(self.bot, ctx, "De quel rôle tu veux voir la liste des membres ?")
+                try:
+                    await self.list_roles(ctx, role=rolename)
+                except AttributeError:
+                    return
 
     # S'attribuer un rôle avec !role add rôle
     @role.command(name="add")
