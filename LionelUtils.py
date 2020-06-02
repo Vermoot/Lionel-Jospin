@@ -1,5 +1,5 @@
 import asyncio
-import discord
+
 
 async def reaction_menu(bot, ctx, question, choices):
     message_text = question
@@ -11,7 +11,7 @@ async def reaction_menu(bot, ctx, question, choices):
     message = await ctx.send(message_text)
     for emoji in choices:
         await message.add_reaction(emoji)
-    def check(reaction, user): return user == ctx.author
+    def check(react, user): return user == ctx.author and react.message.id == message.id
     reaction = await bot.wait_for("reaction_add", check=check)
     return list(reaction)[0].emoji
 
@@ -41,5 +41,15 @@ async def cancellable_question(bot, ctx, question):
         return None
     return result.content
 
-async def me_too(bot, ctx):
+async def sponge(bot, ctx, message, edit_text):
+    await message.add_reaction("🧽")
+
+    def check(react, user):
+        return user == ctx.author and react.message.id == message.id
+
+    sponge_react = await bot.wait_for("reaction_add", check=check)
+    if list(sponge_react)[0].emoji == "🧽":
+        await message.edit(content=edit_text)
+
+async def me_too(bot, ctx, message):
     pass

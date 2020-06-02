@@ -65,7 +65,10 @@ class RolesCog(commands.Cog):
             elif choice1 == "👨‍👨‍👦‍👦":
                 rolename = await cancellable_question(self.bot, ctx, "De quel rôle tu veux voir la liste des membres ?")
                 try:
-                    await self.list_roles(ctx, role=rolename)
+                    if rolename is None:
+                        return
+                    else:
+                        await self.list_roles(ctx, role=rolename)
                 except AttributeError:
                     return
 
@@ -118,7 +121,14 @@ class RolesCog(commands.Cog):
             roles_list = ""
             for role in ctx.guild.roles:
                 roles_list = roles_list + ("%s (%i membres)\n" % (role.name, len(role.members)))
-            await ctx.send("Voici la liste des rôles qui existent ici :\n```\n%s\n```" % str(roles_list))
+            message = await ctx.send("Voici la liste des rôles qui existent ici :"
+                                     "\n```\n%s\n```"
+                                     "Cette liste est peut-être très longue, pour éviter le spam tu peux l'effacer avec 🧽." % str(roles_list))
+            await sponge(self.bot, ctx, message,
+                         "Voici la liste des rôles qui existent ici :"
+                         "\n```\nListe des rôles effacée\n```"
+                         "Cette liste est peut-être très longue, pour éviter le spam tu peux l'effacer avec 🧽.")
+
         else:
             in_role = await self.get_role(ctx, role, ctx.guild.roles)
             if isinstance(in_role, str):
