@@ -1,4 +1,10 @@
 import asyncio
+from difflib import SequenceMatcher
+
+
+def is_similar(str1, str2):
+    '''Compares two strings and returns True if they're similar.'''
+    return SequenceMatcher(None, str1, str2).ratio() > 0.5
 
 
 async def reaction_menu(bot, ctx, question, choices):

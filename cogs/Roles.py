@@ -1,11 +1,5 @@
 from discord.ext import commands
-from difflib import SequenceMatcher
 from LionelUtils import *
-import asyncio
-
-
-def is_similar(str1, str2):
-    return SequenceMatcher(None, str1, str2).ratio() > 0.5
 
 
 class RolesCog(commands.Cog):
