@@ -72,19 +72,46 @@ class RolesCog(commands.Cog):
         new_role = await self.get_role(ctx, role_name, ctx.guild.roles)
         if new_role is None:
             return
-        elif isinstance(new_role, str):
-            role = await ctx.guild.create_role(name=new_role, mentionable=True)
-            await ctx.author.add_roles(role)
-            await ctx.send("Voilà %s, tu as maintenant le rôle %s ! Tu es le premier, invite tes copains!" % (
-                ctx.author.display_name, role.name))
-        elif ctx.author in new_role.members:
-            await ctx.send("Tu as déjà le rôle %s, couillon." % new_role.name)
-            return
         else:
+            first = False
+            if isinstance(new_role, str):
+                new_role = await ctx.guild.create_role(name=new_role, mentionable=True)
+                first = True
+            if ctx.author in new_role.members:
+                await ctx.send("Tu as déjà le rôle %s, couillon." % new_role.name)
+                return
             await ctx.author.add_roles(new_role)
-            await ctx.send(
-                "Voilà %s, tu as maintenant le rôle %s ! Vous êtes %i. Je crois. Mais je suis pas fort en math." % (
-                    ctx.author.display_name, new_role.name, len(new_role.members)))
+            message_text = "Voilà %s, tu as maintenant le rôle %s !" % (
+                ctx.author.display_name, new_role.name)
+            if first:
+                message_text += " Tu es le premier, invite tes copains !"
+            else:
+                message_text += " Vous êtes %i. Je crois. Mais je suis pas fort en math" % len(new_role.members)
+            message = await ctx.send(message_text)
+
+            #me_too
+            await message.add_reaction("🙋")
+            me_too_people = []
+            def check(react, user):
+                print("CHECK")
+                print(react.message.id == message.id and react.emoji == "🙋" and user.id != 648215524290854929)
+                return react.message.id == message.id and react.emoji == "🙋" and user.id != 648215524290854929 and user != ctx.author
+            while True:
+                me_too_react = await self.bot.wait_for("reaction_add", check=check)
+                me_too_people.append(me_too_react[1].display_name)
+                await list(me_too_react)[1].add_roles(new_role)
+                await message.edit(content=message_text + "\n(Ajouté : " + ", ".join(me_too_people) + ")")
+
+                me_too_cancel = await self.bot.wait_for("reaction_remove", check=check) # TODO Use the same method as cancel with pending_tasks
+                me_too_people.remove(me_too_cancel[1].display_name)
+                await list(me_too_cancel)[1].remove_roles(new_role)
+                if len(me_too_people) == 0:
+                    await message.edit(content=message_text)
+                else:
+                    await message.edit(content=message_text + "\n(Ajouté : " + ", ".join(me_too_people) + ")")
+
+
+
             return
 
     # S'enlever un rôle avec !role remove rôle
