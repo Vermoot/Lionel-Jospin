@@ -45,5 +45,7 @@ class LionelCog(commands.Cog):
         else:
             await ctx.send("Bah merde alors !")
 
+
+
 def setup(bot):
     bot.add_cog(LionelCog(bot))

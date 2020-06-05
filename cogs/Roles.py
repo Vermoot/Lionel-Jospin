@@ -94,22 +94,28 @@ class RolesCog(commands.Cog):
             me_too_people = []
             def check(react, user):
                 print("CHECK")
-                print(react.message.id == message.id and react.emoji == "🙋" and user.id != 648215524290854929)
+                print(react.message.id == message.id and react.emoji == "🙋" and user.id != 648215524290854929 and user != ctx.author)
                 return react.message.id == message.id and react.emoji == "🙋" and user.id != 648215524290854929 and user != ctx.author
             while True:
-                me_too_react = await self.bot.wait_for("reaction_add", check=check)
-                me_too_people.append(me_too_react[1].display_name)
-                await list(me_too_react)[1].add_roles(new_role)
-                await message.edit(content=message_text + "\n(Ajouté : " + ", ".join(me_too_people) + ")")
-
-                me_too_cancel = await self.bot.wait_for("reaction_remove", check=check) # TODO Use the same method as cancel with pending_tasks
-                me_too_people.remove(me_too_cancel[1].display_name)
-                await list(me_too_cancel)[1].remove_roles(new_role)
-                if len(me_too_people) == 0:
-                    await message.edit(content=message_text)
-                else:
-                    await message.edit(content=message_text + "\n(Ajouté : " + ", ".join(me_too_people) + ")")
-
+                # me_too_react = await self.bot.wait_for("reaction_add", check=check)
+                # me_too_people.append(me_too_react[1].display_name)
+                # await list(me_too_react)[1].add_roles(new_role)
+                # await message.edit(content=message_text + "\n(Ajouté : " + ", ".join(me_too_people) + ")")
+                #
+                # me_too_cancel = await self.bot.wait_for("reaction_remove", check=check) # TODO Use the same method as cancel with pending_tasks
+                # me_too_people.remove(me_too_cancel[1].display_name)
+                # await list(me_too_cancel)[1].remove_roles(new_role)
+                # if len(me_too_people) == 0:
+                #     await message.edit(content=message_text)
+                # else:
+                #     await message.edit(content=message_text + "\n(Ajouté : " + ", ".join(me_too_people) + ")")
+                pending_tasks = [self.bot.wait_for("reaction_add", check=check),
+                                 self.bot.wait_for("reaction_remove", check=check)]
+                done_tasks, pending_tasks = await asyncio.wait(pending_tasks, return_when=asyncio.FIRST_COMPLETED)
+                for task in pending_tasks:
+                    task.cancel()
+                result = done_tasks.pop().result()
+                print(done_tasks.pop())
 
 
             return
@@ -176,6 +182,20 @@ class RolesCog(commands.Cog):
     @commands.command(name="roll")
     async def add(self, ctx):
         await ctx.send("ROLE bordel, pas roll. Fais un effort marde.")
+
+    # Parce que je crée BEAUCOUP de rôles pour tester et que ça me fait chier de les supprimer un par un.
+    @role.command(name="delete")
+    async def delete_roles(self, ctx, *roles):
+        if ctx.author.id == 160155250702024704:
+            deleted_roles = []
+            for role_to_delete in roles:
+                for existing_role in ctx.guild.roles:
+                    if existing_role.name == role_to_delete:
+                        await existing_role.delete()
+                        deleted_roles.append(existing_role.name)
+            await ctx.send("Rôles %s supprimés." % ", ".join(deleted_roles))
+        else:
+            await ctx.send("Nan y'a que Vermoot qui a le droit.")
 
 
 def setup(bot):
