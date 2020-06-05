@@ -45,6 +45,11 @@ class LionelCog(commands.Cog):
         else:
             await ctx.send("Bah merde alors !")
 
+    @commands.command(name="say")
+    async def say(self, ctx, *, message):
+        print("%s a utilisé !say pour me faire dire \"%s\"" % (ctx.author.display_name, message))
+        await ctx.send(message)
+        await ctx.message.delete()
 
 
 def setup(bot):

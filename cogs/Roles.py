@@ -114,8 +114,9 @@ class RolesCog(commands.Cog):
                 done_tasks, pending_tasks = await asyncio.wait(pending_tasks, return_when=asyncio.FIRST_COMPLETED)
                 for task in pending_tasks:
                     task.cancel()
+                print(done_tasks)
                 result = done_tasks.pop().result()
-                print(done_tasks.pop())
+                print(result)
 
 
             return
