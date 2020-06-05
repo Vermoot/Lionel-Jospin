@@ -47,15 +47,13 @@ async def cancellable_question(bot, ctx, question):
         return None
     return result.content
 
+
 async def sponge(bot, ctx, message, edit_text):
     await message.add_reaction("🧽")
+    def check(react, user): return user == ctx.author and react.message.id == message.id and react.emoji == "🧽"
+    await bot.wait_for("reaction_add", check=check)
+    await message.edit(content=edit_text)
 
-    def check(react, user):
-        return user == ctx.author and react.message.id == message.id
-
-    sponge_react = await bot.wait_for("reaction_add", check=check)
-    if list(sponge_react)[0].emoji == "🧽":
-        await message.edit(content=edit_text)
 
 async def me_too(bot, ctx, message):
     pass
