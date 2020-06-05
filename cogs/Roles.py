@@ -92,32 +92,28 @@ class RolesCog(commands.Cog):
             #me_too
             await message.add_reaction("🙋")
             me_too_people = []
-            def check(react, user):
-                print("CHECK")
-                print(react.message.id == message.id and react.emoji == "🙋" and user.id != 648215524290854929 and user != ctx.author)
-                return react.message.id == message.id and react.emoji == "🙋" and user.id != 648215524290854929 and user != ctx.author
+            def check(payload):
+                return payload.message_id == message.id and payload.emoji.name == "🙋" and payload.user_id != 648215524290854929 and payload.member != ctx.author
             while True:
-                # me_too_react = await self.bot.wait_for("reaction_add", check=check)
-                # me_too_people.append(me_too_react[1].display_name)
-                # await list(me_too_react)[1].add_roles(new_role)
-                # await message.edit(content=message_text + "\n(Ajouté : " + ", ".join(me_too_people) + ")")
-                #
-                # me_too_cancel = await self.bot.wait_for("reaction_remove", check=check) # TODO Use the same method as cancel with pending_tasks
-                # me_too_people.remove(me_too_cancel[1].display_name)
-                # await list(me_too_cancel)[1].remove_roles(new_role)
-                # if len(me_too_people) == 0:
-                #     await message.edit(content=message_text)
-                # else:
-                #     await message.edit(content=message_text + "\n(Ajouté : " + ", ".join(me_too_people) + ")")
-                pending_tasks = [self.bot.wait_for("reaction_add", check=check),
-                                 self.bot.wait_for("reaction_remove", check=check)]
+                pending_tasks = [self.bot.wait_for("raw_reaction_add", check=check),
+                                 self.bot.wait_for("raw_reaction_remove", check=check)]
                 done_tasks, pending_tasks = await asyncio.wait(pending_tasks, return_when=asyncio.FIRST_COMPLETED)
                 for task in pending_tasks:
                     task.cancel()
-                print(done_tasks)
-                result = done_tasks.pop().result()
-                print(result)
-
+                for task in done_tasks:
+                    event = task.result()
+                    user = ctx.guild.get_member(event.user_id)
+                    if event.event_type == "REACTION_ADD":
+                        me_too_people.append(user.display_name)
+                        await user.add_roles(new_role)
+                        await message.edit(content=message_text + "\n(Ajouté : " + ", ".join(me_too_people) + ")")
+                    elif event.event_type == "REACTION_REMOVE":
+                        me_too_people.remove(user.display_name)
+                        await user.remove_roles(new_role)
+                        if len(me_too_people) == 0:
+                            await message.edit(content=message_text)
+                        else:
+                            await message.edit(content=message_text + "\n(Ajouté : " + ", ".join(me_too_people) + ")")
 
             return
 
