@@ -40,7 +40,7 @@ class RolesCog(commands.Cog):
             def check(m):
                 return m.author == ctx.author
             if choice1 == "➕":
-                rolename = await cancellable_question(self.bot, ctx, "Tu veux quoi comme rôle ?")
+                rolename = await cancellable_question(self.bot, ctx, "Tu veux quoi comme rôle ?")  # TODO Mettre ça dans !role add
                 try:
                     await self.add_role(ctx, role_name=rolename)
                 except AttributeError:

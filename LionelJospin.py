@@ -1,15 +1,21 @@
 import os
+import discord
 from discord.ext import commands
 from dotenv import load_dotenv
+
+
+print(discord.__version__)
 
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
 GUILD = os.getenv("DISCORD_GUILD")
-bot = commands.Bot(command_prefix='!')
+intents = discord.Intents.all()
+bot = commands.Bot(command_prefix='!', intents=intents)
 
 # Load Cogs
 init_cogs = ['cogs.Roles',
-             'cogs.Lionel']
+             'cogs.Lionel',
+             'cogs.Highlight']
 for cog in init_cogs:
     bot.load_extension(cog)
 

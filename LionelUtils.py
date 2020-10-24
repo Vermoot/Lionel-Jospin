@@ -57,3 +57,12 @@ async def sponge(bot, ctx, message, edit_text):
 
 async def me_too(bot, ctx, message):
     pass
+
+
+async def get_mutual_guilds(bot, user):
+    mutual_guilds = []
+    for guild in bot.guilds:
+        for member in guild.members:
+            if member == user:
+                mutual_guilds.append(guild)
+    return mutual_guilds
